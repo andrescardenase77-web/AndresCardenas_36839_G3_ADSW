@@ -1,0 +1,62 @@
+@startuml 
+ /' 
+ Archivo: CU03_GestionarDocentes.puml 
+ Versión: v1.0 | Fecha: 2026-11-11 | Equipo: Cárdenas, Bohórquez, Benalcázar 
+ Trazabilidad: RF-06, RF-07, RF-32, RF-33 -> CU-03 -> Sprint 2 
+ Modelo LLM: Claude (Anthropic) 
+ PROMPT: Actúa como analista de software. Con los requisitos atómicos RF-06, RF-07, 
+ RF-32 y RF-33 del CU-03 (registrar, consultar, actualizar y eliminar lógicamente 
+ docentes) genera un diagrama de clases de análisis en PlantUML con boundary, 
+ control, entity y repository. Usa PantallaGestionDocentes y ControlDocente. 
+ Solo código PlantUML. 
+ '/ 
+ skinparam classAttributeIconSize 0 
+ skinparam shadowing false 
+ left to right direction 
+  
+class PantallaGestionDocentes <<boundary>> { 
+   +capturarDatosDocente() 
+   +capturarCriterios(identificacion, nombres, estado) 
+   +mostrarListado(docentes) 
+   +mostrarDetalle(docente) 
+   +confirmarEliminacion() 
+   +mostrarResultado(mensaje: String) 
+ } 
+ class ControlDocente <<control>> { 
+   +registrarDocente(datos) 
+   +consultarDocentes(criterios) 
+   +actualizarDocente(datos) 
+   +eliminarDocente(identificacion) 
+   +validarDatosDocente(datos): boolean 
+ } 
+ class Docente <<entity>> { 
+   -tipoIdentificacion: String 
+   -numeroIdentificacion: String 
+   -nombres: String 
+   -apellidos: String 
+   -correo: String 
+   -telefono: String 
+   -areaConocimiento: String 
+   -estado: String 
+ } 
+ class AsignacionDocente <<entity>> { 
+   -curso: String 
+   -fechaAsignacion: Date 
+   -estado: String 
+ } 
+ class RepositorioDocente <<repository>> { 
+   +buscarPorIdentificacion(identificacion): Docente 
+   +existeCorreo(correo): boolean 
+   +guardar(docente: Docente) 
+   +buscar(criterios): List<Docente> 
+   +actualizar(docente: Docente) 
+   +cambiarEstado(identificacion, estado) 
+ } 
+  
+PantallaGestionDocentes --> ControlDocente : solicita operaciones 
+ ControlDocente --> Docente : crea, valida y modifica 
+ ControlDocente --> AsignacionDocente : consulta 
+ ControlDocente --> RepositorioDocente : guarda y recupera 
+ RepositorioDocente o-- "0..*" Docente : conserva 
+ Docente "1" o-- "0..*" AsignacionDocente : tiene 
+ @enduml 
