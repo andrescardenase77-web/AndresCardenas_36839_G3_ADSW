@@ -1,0 +1,86 @@
+@startuml 
+ /' 
+ Archivo: CU05_CompletarInscripcion.puml 
+ Versión: v1.0 | Fecha: 2026-11-11 | Equipo: Cárdenas, Bohórquez, Benalcázar 
+ Trazabilidad: RF-18, RF-19, RF-20, RF-21 -> CU-05 -> Sprint 5 
+ Modelo LLM: Claude (Anthropic) 
+ PROMPT: Actúa como analista de software. Con los requisitos atómicos RF-18 a RF-21 
+ del CU-05 (completar inscripción, subir comprobante, generar comprobante y 
+ consultar estado) genera un diagrama de clases de análisis en PlantUML con 
+ boundary, control, entity y repository. Usa PantallaInscripcion y 
+ ControlInscripcion. Solo código PlantUML. 
+ '/ 
+ skinparam classAttributeIconSize 0 
+ skinparam shadowing false 
+ left to right direction 
+  
+class PantallaInscripcion <<boundary>> { 
+   +capturarDatosInscripcion() 
+   +adjuntarDocumentos() 
+   +subirComprobante() 
+   +solicitarComprobantePDF() 
+   +consultarEstado() 
+   +mostrarResultado(mensaje: String) 
+   +mostrarEstados(inscripcion, pago, beca) 
+ } 
+ class ControlInscripcion <<control>> { 
+   +completarInscripcion(datos) 
+   +subirComprobante(codigo, archivo, fecha, monto) 
+   +generarComprobante(codigo, identificacion) 
+   +consultarEstado(codigo, identificacion) 
+   +validarInscripcion(datos): boolean 
+   +validarComprobante(archivo, fecha, monto): boolean 
+ } 
+ class Inscripcion <<entity>> { 
+   -codigo: String 
+   -curso: Curso 
+   -nombresApellidos: String 
+   -tipoIdentificacion: String 
+   -numeroIdentificacion: String 
+   -correo: String 
+   -telefono: String 
+   -pais: String 
+   -formacion: String 
+   -estadoInscripcion: String 
+   -estadoPago: String 
+   -estadoBeca: String 
+ } 
+ class Curso <<entity>> { 
+   -nombre: String 
+   -estado: String 
+   -fechaInicioInscripcion: Date 
+   -fechaFinInscripcion: Date 
+   -cuposDisponibles: int 
+ } 
+ class ComprobantePago <<entity>> { 
+   -archivo: String 
+   -fechaPago: Date 
+   -montoDeclarado: Decimal 
+   -estadoPago: String 
+ } 
+ class DocumentoRequerido <<entity>> { 
+   -nombreArchivo: String 
+   -tipoArchivo: String 
+   -tamanoMB: Decimal 
+ } 
+ class RepositorioInscripcion <<repository>> { 
+   +buscarPorCodigo(codigo): Inscripcion 
+   +existeInscripcionActiva(identificacion, curso): boolean 
+   +guardar(inscripcion: Inscripcion) 
+   +asociarDocumento(inscripcion, documento) 
+   +asociarComprobante(inscripcion, comprobante) 
+   +actualizarEstadoPago(codigo, estado) 
+   +obtenerEstados(codigo): Inscripcion 
+ } 
+  
+PantallaInscripcion --> ControlInscripcion : solicita operaciones 
+ ControlInscripcion --> Curso : verifica estado, fechas y cupos 
+ ControlInscripcion --> Inscripcion : crea y consulta 
+ ControlInscripcion --> ComprobantePago : valida y asocia 
+ ControlInscripcion --> DocumentoRequerido : valida y asocia 
+ ControlInscripcion --> RepositorioInscripcion : guarda y recupera 
+ RepositorioInscripcion o-- "0..*" Inscripcion : conserva 
+ Inscripcion "1" o-- "0..*" DocumentoRequerido : adjunta 
+ Inscripcion "1" o-- "0..1" ComprobantePago : registra 
+ Inscripcion "*" --> "1" Curso : corresponde a 
+ @enduml 
