@@ -51,6 +51,7 @@ class PantallaGestionDocentes <<boundary>> {
    +buscar(criterios): List<Docente> 
    +actualizar(docente: Docente) 
    +cambiarEstado(identificacion, estado) 
+   +consultarAsignacionesVigentes(identificacion): List<AsignacionDocente> 
  } 
   
 PantallaGestionDocentes --> ControlDocente : solicita operaciones 
