@@ -65,6 +65,7 @@ class PantallaGestionCursos <<boundary>> {
    +buscarPorCodigo(codigo): Curso 
    +guardarCondicion(curso, condicion) 
    +sustituirAsignacion(curso, docente, motivo) 
+   +contarInscritos(curso): int
    +registrarNotificacion(notificacion: Notificacion) 
  } 
   
