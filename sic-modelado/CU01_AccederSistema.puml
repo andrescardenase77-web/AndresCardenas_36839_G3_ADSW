@@ -30,7 +30,8 @@ class PantallaLogin <<boundary>> {
  class ControlAutenticacion <<control>> { 
    +iniciarSesion(correo, contrasena) 
    +cambiarContrasena(actual, nueva, confirmacion) 
-   +recuperarContrasena(correo) 
+   +recuperarContrasena(correo)
+   +restablecerContrasena(token, nueva, confirmacion)
    +validarFormatoCorreo(correo): boolean 
    +validarPoliticaContrasena(contrasena): boolean 
  } 
