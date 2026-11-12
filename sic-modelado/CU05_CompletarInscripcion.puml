@@ -51,6 +51,7 @@ class PantallaInscripcion <<boundary>> {
    -fechaInicioInscripcion: Date 
    -fechaFinInscripcion: Date 
    -cuposDisponibles: int 
+   +estaHabilitado(): boolean
  } 
  class ComprobantePago <<entity>> { 
    -archivo: String 
