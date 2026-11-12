@@ -1,0 +1,75 @@
+@startuml 
+ /' 
+ Archivo: CU01_AccederSistema.puml 
+ Versión: v1.0 | Fecha: 2026-11-11 | Equipo: Cárdenas, Bohórquez, Benalcázar 
+ Trazabilidad: RF-04, RF-05, RF-27 -> CU-01 -> Sprint 1 
+ Modelo LLM: Claude (Anthropic) 
+ PROMPT: Actúa como analista de software. Con los requisitos atómicos RF-04, RF-05 
+ y RF-27 del CU-01 (iniciar sesión, cambiar y recuperar contraseña) genera un 
+ diagrama de clases de análisis en PlantUML con boundary, control, entity y 
+ repository. Usa ControlAutenticacion como único control. Solo código PlantUML. 
+ '/ 
+ skinparam classAttributeIconSize 0 
+ skinparam shadowing false 
+ left to right direction 
+  
+class PantallaLogin <<boundary>> { 
+   +capturarCredenciales() 
+   +mostrarResultado(mensaje: String) 
+ } 
+ class PantallaCambioPassword <<boundary>> { 
+   +capturarContrasenas(actual, nueva, confirmacion) 
+   +mostrarResultado(mensaje: String) 
+ } 
+ class PantallaRecuperarPassword <<boundary>> { 
+   +solicitarEnlace(correo) 
+   +definirNuevaContrasena(token, nueva, confirmacion) 
+   +mostrarResultado(mensaje: String)
+   
+ } 
+ class ControlAutenticacion <<control>> { 
+   +iniciarSesion(correo, contrasena) 
+   +cambiarContrasena(actual, nueva, confirmacion) 
+   +recuperarContrasena(correo) 
+   +validarFormatoCorreo(correo): boolean 
+   +validarPoliticaContrasena(contrasena): boolean 
+ } 
+ class Usuario <<entity>> { 
+   -correo: String 
+   -contrasenaHash: String 
+   -perfil: String 
+   -estado: String 
+   -intentosFallidos: int 
+   -bloqueadoHasta: Date 
+   -contrasenaTemporal: boolean 
+ } 
+ class Sesion <<entity>> { 
+   -idSesion: String 
+   -perfil: String 
+   -fechaInicio: Date 
+ } 
+ class TokenRecuperacion <<entity>> { 
+   -valor: String 
+   -fechaExpiracion: Date 
+   -usado: boolean 
+ } 
+ class RepositorioUsuario <<repository>> { 
+   +buscarPorCorreo(correo): Usuario 
+   +actualizarContrasena(usuario, hash) 
+   +registrarIntentoFallido(usuario) 
+   +guardarToken(token: TokenRecuperacion) 
+   +buscarToken(valor): TokenRecuperacion 
+   +invalidarToken(token: TokenRecuperacion) 
+ } 
+  
+PantallaLogin --> ControlAutenticacion : solicita operaciones 
+ PantallaCambioPassword --> ControlAutenticacion : solicita operaciones 
+ PantallaRecuperarPassword --> ControlAutenticacion : solicita operaciones 
+ ControlAutenticacion --> Usuario : valida y actualiza 
+ ControlAutenticacion --> Sesion : crea 
+ ControlAutenticacion --> TokenRecuperacion : genera y valida 
+ ControlAutenticacion --> RepositorioUsuario : guarda y recupera 
+ RepositorioUsuario o-- "0..*" Usuario : conserva 
+ Usuario "1" o-- "0..*" TokenRecuperacion : solicita 
+ Usuario "1" --> "0..*" Sesion : abre 
+ @enduml 
