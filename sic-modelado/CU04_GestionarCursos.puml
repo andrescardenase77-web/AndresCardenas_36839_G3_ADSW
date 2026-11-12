@@ -1,0 +1,81 @@
+@startuml 
+ /' 
+ Archivo: CU04_GestionarCursos.puml 
+ Versión: v1.0 | Fecha: 2026-11-11 | Equipo: Cárdenas, Bohórquez, Benalcázar 
+ Trazabilidad: RF-08 a RF-14 -> CU-04 -> Sprints 3 y 4 
+ Modelo LLM: Claude (Anthropic) 
+ PROMPT: Actúa como analista de software. Con los requisitos atómicos RF-08 a RF-14 
+ del CU-04 (registrar y actualizar información académica y condiciones de 
+ inscripción, asignar y reasignar docente, reprogramar curso) genera un diagrama 
+ de clases de análisis en PlantUML con boundary, control, entity y repository. 
+ Usa PantallaGestionCursos y ControlCurso. Solo código PlantUML. 
+ '/ 
+ skinparam classAttributeIconSize 0 
+ skinparam shadowing false 
+ left to right direction 
+  
+class PantallaGestionCursos <<boundary>> { 
+   +capturarInformacionAcademica() 
+   +capturarCondiciones() 
+   +seleccionarDocente() 
+   +capturarReprogramacion() 
+   +mostrarResultado(mensaje: String) 
+ } 
+ class ControlCurso <<control>> { 
+   +registrarInformacionAcademica(datos) 
+   +configurarCondiciones(curso, condiciones) 
+   +asignarDocente(curso, docente) 
+   +actualizarInformacionAcademica(curso, datos) 
+   +actualizarCondiciones(curso, condiciones) 
+   +reasignarDocente(curso, docente, motivo) 
+   +reprogramarCurso(curso, fechas, motivo) 
+   +validarCronologia(fechas): boolean 
+ } 
+ class Curso <<entity>> { 
+   -nombre: String 
+   -descripcion: String 
+   -contenido: String 
+   -horasAcademicas: int 
+   -modalidad: String 
+   -tipo: String 
+   -estado: String 
+   -gratuito: boolean 
+ } 
+ class CondicionCurso <<entity>> { 
+   -fechaInicioInscripcion: Date 
+   -fechaFinInscripcion: Date 
+   -fechaInicioEjecucion: Date 
+   -fechaFinEjecucion: Date 
+   -cupos: int 
+   -costo: Decimal 
+   -requisitos: String 
+ } 
+ class AsignacionDocente <<entity>> { 
+   -fechaAsignacion: Date 
+   -motivo: String 
+ } 
+ class Notificacion <<entity>> { 
+   -tipoEvento: String 
+   -destinatario: String 
+   -fecha: Date 
+ } 
+ class Docente <<entity>> 
+ class RepositorioCurso <<repository>> { 
+   +guardar(curso: Curso) 
+   +buscarPorCodigo(codigo): Curso 
+   +guardarCondicion(curso, condicion) 
+   +sustituirAsignacion(curso, docente, motivo) 
+   +registrarNotificacion(notificacion: Notificacion) 
+ } 
+  
+PantallaGestionCursos --> ControlCurso : solicita operaciones 
+ ControlCurso --> Curso : crea, valida y modifica 
+ ControlCurso --> CondicionCurso : configura 
+ ControlCurso --> AsignacionDocente : registra 
+ ControlCurso --> Notificacion : genera 
+ ControlCurso --> RepositorioCurso : guarda y recupera 
+ RepositorioCurso o-- "0..*" Curso : conserva 
+ Curso "1" *-- "0..1" CondicionCurso : define 
+ Curso "1" o-- "0..*" AsignacionDocente : historial 
+ AsignacionDocente "*" --> "1" Docente : responsable 
+ @enduml 
