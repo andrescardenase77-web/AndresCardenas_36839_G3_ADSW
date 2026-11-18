@@ -1,0 +1,55 @@
+@startuml
+title Diagrama de Clases - Taller CRUD de Estudiantes
+
+package "modelo" {
+    class Estudiante {
+        +id: String
+        +nombre: String
+        +edad: Number
+        +constructor(id: String, nombre: String, edad: Number)
+    }
+}
+
+package "datos" {
+    class RepositorioEstudiante {
+        -estudiantes: Estudiante[]
+        +constructor()
+        +guardar(estudiante: Estudiante): void
+        +listarTodos(): Estudiante[]
+        +buscarPorId(id: String): Estudiante
+        +actualizar(id: String, nombre: String, edad: Number): Boolean
+        +eliminar(id: String): Boolean
+    }
+}
+
+package "logica" {
+    class EstudianteControlador {
+        -vista: EstudianteVista
+        -repositorio: RepositorioEstudiante
+        +constructor(vista: EstudianteVista, repositorio: RepositorioEstudiante)
+        +validarDatos(id: String, nombre: String, edad: String): String | null
+        +crearEstudiante(): Promise<void>
+        +listarEstudiantes(): void
+        +buscarEstudiante(): Promise<void>
+        +editarEstudiante(): Promise<void>
+        +eliminarEstudiante(): Promise<void>
+    }
+}
+
+package "presentacion" {
+    class EstudianteVista {
+        -rl: readline.Interface
+        +constructor()
+        +solicitarDato(mensaje: String): Promise<String>
+        +mostrarMensaje(mensaje: String): void
+        +mostrarEstudiantes(estudiantes: Estudiante[]): void
+        +mostrarEstudiante(estudiante: Estudiante): void
+        +cerrar(): void
+    }
+}
+
+RepositorioEstudiante "1" o-- "0..*" Estudiante : almacena
+EstudianteControlador "1" --> "1" RepositorioEstudiante : usa
+EstudianteControlador "1" --> "1" EstudianteVista : utiliza
+
+@enduml

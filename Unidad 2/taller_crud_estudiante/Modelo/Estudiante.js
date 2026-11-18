@@ -1,10 +1,9 @@
 
 class Estudiante {
-    constructor(id, nombre, apellido, direccion) {
+    constructor(id, nombre, edad) {
         this.id = id;
         this.nombre = nombre;
-        this.apellido = apellido;
-        this.direccion = direccion;
+        this.edad = edad;
     }
 }
 

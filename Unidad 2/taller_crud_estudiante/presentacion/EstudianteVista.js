@@ -1,4 +1,3 @@
-
 const readline = require('readline');
 
 class EstudianteVista {
@@ -33,8 +32,7 @@ class EstudianteVista {
         estudiantes.forEach((estudiante) => {
             console.log('ID:', estudiante.id);
             console.log('Nombre:', estudiante.nombre);
-            console.log('Apellido:', estudiante.apellido);
-            console.log('Dirección:', estudiante.direccion);
+            console.log('Edad:', estudiante.edad);
             console.log('---------------------------');
         });
     }
@@ -48,8 +46,7 @@ class EstudianteVista {
         console.log('\n===== ESTUDIANTE ENCONTRADO =====');
         console.log('ID:', estudiante.id);
         console.log('Nombre:', estudiante.nombre);
-        console.log('Apellido:', estudiante.apellido);
-        console.log('Dirección:', estudiante.direccion);
+        console.log('Edad:', estudiante.edad);
     }
 
     cerrar() {

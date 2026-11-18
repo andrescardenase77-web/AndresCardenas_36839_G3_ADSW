@@ -1,9 +1,10 @@
-
-const EstudianteVista = require('./vista/EstudianteVista');
-const EstudianteControlador = require('./controlador/EstudianteControlador');
+const EstudianteVista = require('./presentacion/EstudianteVista');
+const RepositorioEstudiante = require('./datos/RepositorioEstudiante');
+const EstudianteControlador = require('./logica/EstudianteControlador');
 
 const vista = new EstudianteVista();
-const controlador = new EstudianteControlador(vista);
+const repositorio = new RepositorioEstudiante();
+const controlador = new EstudianteControlador(vista, repositorio);
 
 async function menu() {
 
@@ -29,6 +30,7 @@ async function menu() {
             case '2':
                 controlador.listarEstudiantes();
                 break;
+
             case '3':
                 await controlador.buscarEstudiante();
                 break;
