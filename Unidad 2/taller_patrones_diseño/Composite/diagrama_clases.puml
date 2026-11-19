@@ -1,0 +1,88 @@
+@startuml
+title Diagrama de Clases - CRUD de Estudiantes (Patrón Composite)
+
+package "modelo" {
+    abstract class ComponenteAcademico {
+        +id: String
+        +nombre: String
+        +constructor(id: String, nombre: String)
+        +mostrar(indentacion: Number): void
+        +contarEstudiantes(): Number
+        +buscarPorId(id: String): ComponenteAcademico | null
+        +obtenerEstudiantes(): Estudiante[]
+    }
+
+    class Estudiante {
+        +edad: Number
+        +constructor(id: String, nombre: String, edad: Number)
+        +mostrar(indentacion: Number): void
+        +contarEstudiantes(): Number
+        +buscarPorId(id: String): Estudiante | null
+        +obtenerEstudiantes(): Estudiante[]
+    }
+
+    class GrupoEstudiantes {
+        -hijos: ComponenteAcademico[]
+        +constructor(id: String, nombre: String)
+        +agregar(componente: ComponenteAcademico): void
+        +eliminar(id: String): Boolean
+        +mostrar(indentacion: Number): void
+        +contarEstudiantes(): Number
+        +buscarPorId(id: String): ComponenteAcademico | null
+        +obtenerEstudiantes(): Estudiante[]
+    }
+}
+
+package "datos" {
+    class RepositorioEstudiante {
+        -raiz: GrupoEstudiantes
+        +constructor()
+        +guardar(estudiante: Estudiante, idGrupoPadre: String): Boolean
+        +guardarGrupo(grupo: GrupoEstudiantes, idGrupoPadre: String): Boolean
+        +listarTodos(): Estudiante[]
+        +obtenerEstructura(): GrupoEstudiantes
+        +buscarComponentePorId(id: String): ComponenteAcademico | null
+        +buscarPorId(id: String): Estudiante | null
+        +buscarGrupoPorId(id: String): GrupoEstudiantes | null
+        +actualizar(id: String, nombre: String, edad: Number): Boolean
+        +eliminar(id: String): Boolean
+    }
+}
+
+package "logica" {
+    class EstudianteControlador {
+        -vista: EstudianteVista
+        -repositorio: RepositorioEstudiante
+        +constructor(vista: EstudianteVista, repositorio: RepositorioEstudiante)
+        +validarDatos(id: String, nombre: String, edad: String): String | null
+        +crearEstudiante(): Promise<void>
+        +crearGrupo(): Promise<void>
+        +listarEstudiantes(): void
+        +mostrarEstructura(): void
+        +buscarEstudiante(): Promise<void>
+        +editarEstudiante(): Promise<void>
+        +eliminarEstudiante(): Promise<void>
+    }
+}
+
+package "presentacion" {
+    class EstudianteVista {
+        -rl: readline.Interface
+        +constructor()
+        +solicitarDato(mensaje: String): Promise<String>
+        +mostrarMensaje(mensaje: String): void
+        +mostrarEstudiantes(estudiantes: Estudiante[]): void
+        +mostrarEstructura(componenteRaiz: ComponenteAcademico): void
+        +mostrarEstudiante(estudiante: Estudiante): void
+        +cerrar(): void
+    }
+}
+
+Estudiante --|> ComponenteAcademico
+GrupoEstudiantes --|> ComponenteAcademico
+GrupoEstudiantes "1" o-- "0..*" ComponenteAcademico : contiene
+RepositorioEstudiante "1" *-- "1" GrupoEstudiantes : administra raíz
+EstudianteControlador "1" --> "1" RepositorioEstudiante : usa
+EstudianteControlador "1" --> "1" EstudianteVista : utiliza
+
+@enduml

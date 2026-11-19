@@ -1,0 +1,91 @@
+@startuml
+title Diagrama de Clases - CRUD de Estudiantes (Patrón Decorador)
+
+package "modelo" {
+    class Estudiante {
+        +id: String
+        +nombre: String
+        +edad: Number
+        +constructor(id: String, nombre: String, edad: Number)
+    }
+}
+
+package "datos" {
+    class RepositorioEstudiante {
+        -estudiantes: Estudiante[]
+        +constructor()
+        +guardar(estudiante: Estudiante): void
+        +listarTodos(): Estudiante[]
+        +buscarPorId(id: String): Estudiante
+        +actualizar(id: String, nombre: String, edad: Number): Boolean
+        +eliminar(id: String): Boolean
+    }
+
+    package "decoradores" {
+        class RepositorioDecorador {
+            #repositorio: RepositorioEstudiante
+            +constructor(repositorio: RepositorioEstudiante)
+            +guardar(estudiante: Estudiante): void
+            +listarTodos(): Estudiante[]
+            +buscarPorId(id: String): Estudiante
+            +actualizar(id: String, nombre: String, edad: Number): Boolean
+            +eliminar(id: String): Boolean
+        }
+
+        class LogRepositorioDecorador {
+            +registrarLog(accion: String, detalle: String): void
+            +guardar(estudiante: Estudiante): void
+            +listarTodos(): Estudiante[]
+            +buscarPorId(id: String): Estudiante
+            +actualizar(id: String, nombre: String, edad: Number): Boolean
+            +eliminar(id: String): Boolean
+        }
+
+        class EstadisticasRepositorioDecorador {
+            -estadisticas: Object
+            +constructor(repositorio: RepositorioEstudiante)
+            +guardar(estudiante: Estudiante): void
+            +listarTodos(): Estudiante[]
+            +buscarPorId(id: String): Estudiante
+            +actualizar(id: String, nombre: String, edad: Number): Boolean
+            +eliminar(id: String): Boolean
+            +obtenerResumen(): Object
+        }
+    }
+}
+
+package "logica" {
+    class EstudianteControlador {
+        -vista: EstudianteVista
+        -repositorio: RepositorioEstudiante
+        +constructor(vista: EstudianteVista, repositorio: RepositorioEstudiante)
+        +validarDatos(id: String, nombre: String, edad: String): String | null
+        +crearEstudiante(): Promise<void>
+        +listarEstudiantes(): void
+        +buscarEstudiante(): Promise<void>
+        +editarEstudiante(): Promise<void>
+        +eliminarEstudiante(): Promise<void>
+    }
+}
+
+package "presentacion" {
+    class EstudianteVista {
+        -rl: readline.Interface
+        +constructor()
+        +solicitarDato(mensaje: String): Promise<String>
+        +mostrarMensaje(mensaje: String): void
+        +mostrarEstudiantes(estudiantes: Estudiante[]): void
+        +mostrarEstudiante(estudiante: Estudiante): void
+        +mostrarEstadisticas(resumen: Object): void
+        +cerrar(): void
+    }
+}
+
+RepositorioEstudiante "1" o-- "0..*" Estudiante : almacena
+RepositorioDecorador "1" o-- "1" RepositorioEstudiante : envuelve
+LogRepositorioDecorador --|> RepositorioDecorador
+EstadisticasRepositorioDecorador --|> RepositorioDecorador
+EstudianteControlador "1" --> "1" RepositorioDecorador : usa (transparentemente)
+EstudianteControlador "1" --> "1" EstudianteVista : utiliza
+
+@enduml
